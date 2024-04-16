@@ -9,28 +9,27 @@
 
 int main()
 {
-  int pin[] = {5, 6, 13, 19, 26};
-  wiringPiSetupGpio();
-  for (int i = 0; i < 5; i++)
-    {
-      pinMode(pin[i], INPUT);
-    }
-  while (1)
-    {
-      for (int i = 0; i < 5; i++)
+	int pin[] = {5, 6, 13, 19, 26};
+	wiringPiSetupGpio();
+	for (int i = 0; i < 5; i++)
 	{
-	  if (digitalRead(pin[i]) == HIGH)
-	    {
-	      printf("1");
-	    }
-	    else
-	    {
-	      printf("0");
-	    }
-	    printf(" ");
-	    
+		pinMode(pin[i], INPUT);
 	}
-	  printf("\r");
-    }
-  return 0;
+	while (1)
+	{
+		for (int i = 0; i < 5; i++)
+		{
+			if (digitalRead(pin[i]) == HIGH)
+			{
+				printf("1");
+			}
+			else
+			{
+				printf("0");
+			}
+			printf(" ");
+		}
+		printf("\r");
+	}
+	return 0;
 }
