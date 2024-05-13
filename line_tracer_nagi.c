@@ -212,7 +212,7 @@ int main()
 		pinMode(pin[i], INPUT);
 	}
 
-	while (1)
+	/*while (1)
 	{
 		while (1)
 		{
@@ -257,5 +257,5 @@ int main()
 		}
 
 		motor_dirve(fd, l, r);
-	}
+	}*/
 }
