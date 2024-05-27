@@ -111,7 +111,101 @@ int motor_dirve(int fd, int lm, int rm)
 	return 0; // 戻り値は常に 0
 }
 
-int phase_1(int fd, int* pin) {
+int phase_1(int fd, int *pin)
+{
+  printf("phase1\n");
+  int state[5] = {0};
+  int i, l, r, flag;
+  while (1)
+    {
+      while (1)
+	{
+	  flag = 0;
+	  for (i = 0; i < 5; i++)
+	    {
+	      state[i] = digitalRead(pin[i]);
+	      flag += state[i];
+	    }
+	  if (flag == 10) //test (true is "0")
+            {
+	      phase_2(fd, pin);
+	      return 0;
+            }
+
+	  // acute right
+	  if (state[3] == 1 && state[4] == 1 && flag == 2)
+	    {
+	      if (r != RM * -0.5 || l != LM)
+                {
+		  printf("acute right\n");
+		  r = RM * -0.5;
+		  l = LM;
+		  break;
+                }
+	      continue;
+	    }
+	  
+	  // right
+	  if (state[2] == 1 && state[3] == 1 && flag == 2)
+	    {
+	      if (r != 0 || l != LM)
+		{
+		  printf("right\n");
+		  r = 0;
+		  l = LM;
+		  break;
+                }
+	      continue;
+	    }
+
+	  // acute left
+	  if (state[0] == 1 && state[1] == 1 && flag == 2)
+	    {
+	      if (r != RM || l != LM * -0.5)
+		{
+		  printf("acute left\n");
+		  r = RM;
+		  l = LM * -0.5;
+		  break;
+		}
+	      continue;
+	    }
+
+	  // left
+	  if (state[1] == 1 && state[2] == 1 && flag == 2)
+	    {
+    	      if (r != RM || l != 0)
+		{
+		  printf("left\n");
+		  r = RM;
+		  l = 0;
+		  break;
+		}
+	      continue;
+	    }
+	    
+	  
+	  // straight
+	  if (state[2] == 1 && (state[1] == 1 || state[3] == 1) && flag == 2)
+	    {
+	      if (r != RM || l != LM)
+		{
+		  printf("straight\n");
+		  r = RM;
+		  l = LM;
+		  break;
+                }
+	      continue;
+	    }
+	}
+      motor_dirve(fd, l, r);
+      delay(100);
+    }
+    
+	
+}
+
+/*int phase_1(int fd, int* pin) {
   printf("phase1\n");
   int state[5] = {0};
   int i, l, r;
@@ -145,7 +239,7 @@ int phase_1(int fd, int* pin) {
     printf("%d, %d\n", r, l);
     motor_dirve(fd, l, r);
   }
-}
+}*/
 
 int phase_2(int fd, int* pin) {
   printf("phase2\n");
@@ -207,8 +301,15 @@ int main()
   for (i = 0; i < 5; i++) {
     pinMode(pin[i],INPUT);
   }
-  
-  phase_1(fd, pin);
+  while (1) {
+    for (int i = 0; i < 5; i++) {
+      state[i] = digitalRead(pin[i]);
+    }
+    if (state[2] == 1 && (state[1] == 1 || state[3] == 1) && state[0] == 0 && state[4] == 0) {
+      phase_1(fd, pin);
+      break;
+    }
+  }
   motor_dirve(fd, 0, 0);
   return 0;
 		  
