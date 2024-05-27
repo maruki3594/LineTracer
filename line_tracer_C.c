@@ -138,7 +138,7 @@ int phase_1(int fd, int *pin)
 	      if (r != RM * -0.5 || l != LM)
                 {
 		  printf("acute right\n");
-		  r = RM * -0.5;
+		  r = 0;
 		  l = LM;
 		  break;
                 }
@@ -151,7 +151,7 @@ int phase_1(int fd, int *pin)
 	      if (r != 0 || l != LM)
 		{
 		  printf("right\n");
-		  r = 0;
+		  r = 0.5 * RM;
 		  l = LM;
 		  break;
                 }
@@ -165,7 +165,7 @@ int phase_1(int fd, int *pin)
 		{
 		  printf("acute left\n");
 		  r = RM;
-		  l = LM * -0.5;
+		  l = 0;
 		  break;
 		}
 	      continue;
@@ -178,7 +178,7 @@ int phase_1(int fd, int *pin)
 		{
 		  printf("left\n");
 		  r = RM;
-		  l = 0;
+		  l = 0.5 * LM;
 		  break;
 		}
 	      continue;
@@ -186,7 +186,7 @@ int phase_1(int fd, int *pin)
 	    
 	  
 	  // straight
-	  if (state[2] == 1 && (state[1] == 1 || state[3] == 1) && flag == 2)
+	  /*if (state[2] == 1 && (state[1] == 1 || state[3] == 1) && flag == 2)
 	    {
 	      if (r != RM || l != LM)
 		{
@@ -196,7 +196,7 @@ int phase_1(int fd, int *pin)
 		  break;
                 }
 	      continue;
-	    }
+	    }/*
 	}
       motor_dirve(fd, l, r);
       delay(100);
