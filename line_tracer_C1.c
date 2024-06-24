@@ -157,79 +157,37 @@ int phase_1(int fd, int *pin)
                 l = LM;
                 break;
             }
-            if ((state[3] == 1 && state[4] == 1) || (state[4] == 1) && (r != RM || l != 0))
+            // if ((state[2] == 1 && state[3] == 1 && state[4] == 0) && (r != RM || l != 0.8 * LM))
+            if ((state[3] == 1) && (r != RM || l != 0.8 * LM))
+            {
+                printf("left\n");
+                r = RM;
+                l = 0.8 * LM;
+                break;
+            }
+            // if ((state[2] == 1 && state[1] == 1 && state[0] == 0) && (r != 0.8 * RM || l != LM))
+            if ((state[1] == 1) && (r != 0.8 * RM || l != LM))
+            {
+                printf("right\n");
+                r = 0.8 * RM;
+                l = LM;
+                break;
+            }
+            // if ((state[3] == 1 && state[4] == 1) || (state[4] == 1) && (r != RM || l != 0))
+            if ((state[4] == 1) && (r != RM || l != 0))
             {
                 printf("acute left\n");
                 r = RM;
                 l = 0;
                 break;
             }
-            if ((state[2] == 1 && state[3] == 1) && (r != RM || l != 0.5 * LM))
-            {
-                printf("left\n");
-                r = RM;
-                l = 0.9 * LM;
-                break;
-            }
-            if ((state[2] == 1 && state[1] == 1) && (r != 0.5 * RM || l != LM))
-            {
-                printf("right\n");
-                r = 0.5 * RM;
-                l = LM;
-                break;
-            }
-            // else if (state[2] == 1 && state[3] == 1 && flag == 2 && (r != 0.5 * RM || l != LM))
-            // {
-            //     printf("right\n");
-            //     r = 0.9 * RM;
-            //     l = LM;
-            //     break;
-            // }
-            if ((state[0] == 1 && state[1] == 1) || (state[0] == 1) && (r != 0 || l != LM))
+            if ((state[0] == 1) && (r != 0 || l != LM))
             {
                 printf("acute right\n");
                 r = 0;
                 l = LM;
                 break;
             }
-
-            // if (state[2] == 1 && (state[1] == 1 || state[3] == 1) && state[0] == 0 && state[4] == 0 && (r != RM || l != LM))
-            // {
-            //     printf("straight\n");
-            //     r = RM;
-            //     l = LM;
-            //     break;
-            // }
-            
-            // if (state[1] == 1 && state[2] == 1 && flag == 2 && (r != RM || l != 0.5 * LM))
-            // {
-            //     printf("left\n");
-            //     r = RM;
-            //     l = 0.9 * LM;
-            //     break;
-            // }
-
-            // if (state[2] == 1 && (state[1] == 1 || state[3] == 1) && state[0] == 0 && state[4] == 0 && (r != RM || l != LM))
-            // {
-            //     printf("straight\n");
-            //     r = RM;
-            //     l = LM;
-            //     break;
-            // }
-            
-
-            // straight
-            /*if (state[2] == 1 && (state[1] == 1 || state[3] == 1) && flag == 2)
-              {
-                if (r != RM || l != LM)
-            {
-              printf("straight\n");
-              r = RM;
-              l = LM;
-              break;
-                        }
-                continue;
-                }*/
         }
         motor_dirve(fd, l, r);
         delay(100);
