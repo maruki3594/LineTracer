@@ -80,7 +80,7 @@ int set_pwm_output(int fd, int pwmch, int outval)
     return ef; // エラーがなければ 0 が返る
 }
 
-int motor_dirve(int fd, int lm, int rm)
+int motor_drive(int fd, int lm, int rm)
 // モーターを制御するための関数
 // fd は I2C 初期化時のファイルディスクプリタ（デバイス番号のようなもの）
 // lm は左モーター、rm は右モーターの駆動数値で、-16～+16 の範囲で指定
@@ -143,10 +143,22 @@ int phase_1(int fd, int *pin)
                 state[i] = digitalRead(pin[i]);
                 flag += state[i];
             }
-            if (flag == 10) // test (true is "0")
+            if (flag == 0) // test (true is "0")
             {
-                phase_2(fd, pin);
-                return 0;
+                // phase_2(fd, pin);
+                motor_drive(fd, -RM, LM);
+                while (1)
+                {
+                    flag = 0;
+                    for (i = 0; i < 5; i++)
+                    {
+                        state[i] = digitalRead(pin[i]);
+                        flag += state[i];
+                    }
+                    if (flag != 0) break;
+                }
+                
+                // return 0;
             }
 
             // if (state[2] == 1 && (state[1] == 1 || state[3] == 1) && state[0] == 0 && state[4] == 0 && (r != RM || l != LM))
@@ -158,30 +170,30 @@ int phase_1(int fd, int *pin)
                 break;
             }
             // if ((state[2] == 1 && state[3] == 1 && state[4] == 0) && (r != RM || l != 0.8 * LM))
-            if ((state[3] == 1) && (r != RM || l != 0.8 * LM))
+            if ((state[1] == 1) && (r != RM || l != 0.8 * LM))
             {
                 printf("left\n");
                 r = RM;
-                l = 0.8 * LM;
+                l = 0.9 * LM;
                 break;
             }
             // if ((state[2] == 1 && state[1] == 1 && state[0] == 0) && (r != 0.8 * RM || l != LM))
-            if ((state[1] == 1) && (r != 0.8 * RM || l != LM))
+            if ((state[3] == 1) && (r != 0.8 * RM || l != LM))
             {
                 printf("right\n");
-                r = 0.8 * RM;
+                r = 0.9 * RM;
                 l = LM;
                 break;
             }
             // if ((state[3] == 1 && state[4] == 1) || (state[4] == 1) && (r != RM || l != 0))
-            if ((state[4] == 1) && (r != RM || l != 0))
+            if ((state[0] == 1) && (r != RM || l != 0))
             {
                 printf("acute left\n");
                 r = RM;
                 l = 0;
                 break;
             }
-            if ((state[0] == 1) && (r != 0 || l != LM))
+            if ((state[4] == 1) && (r != 0 || l != LM))
             {
                 printf("acute right\n");
                 r = 0;
@@ -189,7 +201,7 @@ int phase_1(int fd, int *pin)
                 break;
             }
         }
-        motor_dirve(fd, l, r);
+        motor_drive(fd, l, r);
         delay(100);
     }
 }
@@ -226,7 +238,7 @@ int phase_1(int fd, int *pin)
       }
     }
     printf("%d, %d\n", r, l);
-    motor_dirve(fd, l, r);
+    motor_drive(fd, l, r);
   }
 }*/
 
@@ -283,7 +295,7 @@ int phase_2(int fd, int *pin)
             }
 
         }
-        motor_dirve(fd, l, r);
+        motor_drive(fd, l, r);
         delay(100);
     }
 }
@@ -308,7 +320,7 @@ int main()
     int pin[5] = {5, 6, 13, 19, 26};
     int i, l, r;
     int state[5] = {0};
-    motor_dirve(fd, 0, 0);
+    motor_drive(fd, 0, 0);
     l = 0;
     r = 0;
     for (i = 0; i < 5; i++)
@@ -327,7 +339,7 @@ int main()
             break;
         }
     }
-    motor_dirve(fd, 0, 0);
+    motor_drive(fd, 0, 0);
     return 0;
 
     /*while (1) {
@@ -362,7 +374,7 @@ int main()
       }
       }
 
-      motor_dirve(fd, l, r);
+      motor_drive(fd, l, r);
 
       }*/
 }
