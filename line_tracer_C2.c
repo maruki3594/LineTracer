@@ -130,7 +130,7 @@ int motor_drive(int fd, int lm, int rm)
 // 黒のときに1
 int phase_1(int fd, int *pin)
 {
-    printf("phase1\n");
+    printf("phase1\n"); 
     int state[5] = {0};
     int i, l, r, flag;
     while (1)
@@ -143,9 +143,8 @@ int phase_1(int fd, int *pin)
                 state[i] = digitalRead(pin[i]);
                 flag += state[i];
             }
-            if (flag == 0) // test (true is "0")
+            if (flag == 0) // test (True value is "0")
             {
-                // phase_2(fd, pin);
                 motor_drive(fd, -RM, LM);
                 while (1)
                 {
@@ -157,8 +156,6 @@ int phase_1(int fd, int *pin)
                     }
                     if (flag != 0) break;
                 }
-                
-                // return 0;
             }
 
             if ((state[2] == 1) && flag == 1 && (r != RM || l != LM))
@@ -168,14 +165,14 @@ int phase_1(int fd, int *pin)
                 l = LM;
                 break;
             }
-            if ((state[1] == 1) && (r != RM || l != 0.8 * LM))
+            if ((state[1] == 1) && (r != RM || l != 0.9 * LM))
             {
                 printf("left\n");
                 r = RM;
                 l = 0.9 * LM;
                 break;
             }
-            if ((state[3] == 1) && (r != 0.8 * RM || l != LM))
+            if ((state[3] == 1) && (r != 0.9 * RM || l != LM))
             {
                 printf("right\n");
                 r = 0.9 * RM;
