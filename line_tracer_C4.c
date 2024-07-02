@@ -49,6 +49,10 @@
 #define LM 7
 #define RM 7
 
+const double Kp = 1.0;
+const double Ki = 0.1;
+const double Kd = 0.01; 
+
 int phase_1(int fd, int *pin);
 int phase_2(int fd, int *pin);
 int phase_3(int fd, int *pin);
@@ -133,7 +137,7 @@ int phase_1(int fd, int *pin)
     printf("phase1\n"); 
     int state[5] = {0};
     int i, l, r, flag;
-    double set_point = 0.5
+    double set_point = RM;
     double error = 0;
     double integral = 0;
     double previous_error = 0;
@@ -145,31 +149,43 @@ int phase_1(int fd, int *pin)
             flag = 0;
             for (i = 0; i < 5; i++)
             {
-                state[i] = digitalRead(pin[i]);
-                flag += state[i];
-            }
-            if (flag == 0) // test (True value is "0")
-            {
-                motor_drive(fd, -RM, LM);
-                while (1)
+                if (state[i] == 0)
                 {
-                    flag = 0;
-                    for (i = 0; i < 5; i++)
-                    {
-                        state[i] = digitalRead(pin[i]);
-                        flag += state[i];
-                    }
-                    if (flag != 0) break;
+                    state[i] = 1;
                 }
+                else
+                {
+                    state[i] = 0;
+                }
+                
+                flag += state[i];
+                // state[i] *= RM;
             }
+            // if (flag == 5) // test (True value is "0")
+            // {
+            //     // motor_drive(fd, -RM, LM);
+            //     // while (1)
+            //     // {
+            //     //     flag = 0;
+            //     //     for (i = 0; i < 5; i++)
+            //     //     {
+            //     //         state[i] = digitalRead(pin[i]);
+            //     //         flag += state[i];
+            //     //     }
+            //     //     if (flag != 0) break;
+            //     // }
 
-            error = set_point - (state[0] * 0.5 + state[1] * 0.75 + state[2] * 1.0 + state[3] * 0.75 + state[4] * 0.5);
+            //     motor_drive(fd, RM, LM);
+            // }
+
+            error = (state[0] * 0.5 + state[1] * 0.75 + state[2] * 1.0 + state[3] * -0.75 + state[4] * -0.5) - set_point;
             integral += error;
             derivative = error - previous_error;
             output = Kp * error + Ki * integral + Kd * derivative;
 
             // モーターの速度を調整
-            motor_drive(fd, LM + output, RM - output);
+            motor_drive(fd, RM + output, LM - output);
+            printf("%f %f\r", RM + output, LM - output);
 
             previous_error = error;
             

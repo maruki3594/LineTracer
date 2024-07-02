@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <wiringPi.h>
 #include <wiringPiI2C.h>
+#include <time.h>
 
 // 以下、定数宣言です
 // PWM ユニットの I2C アドレス
@@ -132,7 +133,8 @@ int phase_1(int fd, int *pin)
 {
     printf("phase1\n"); 
     int state[5] = {0};
-    int i, l, r, flag;
+    int old_time = clock();
+    int i, l, r, flag, pre_flag;
     while (1)
     {
         while (1)
@@ -143,9 +145,10 @@ int phase_1(int fd, int *pin)
                 state[i] = digitalRead(pin[i]);
                 flag += state[i];
             }
-            if (flag == 0) // test (True value is "0")
+            if (flag == 0 && clock() >= old_time + 100)
             {
                 motor_drive(fd, -RM, LM);
+                printf("turn\n");
                 while (1)
                 {
                     flag = 0;
@@ -154,8 +157,17 @@ int phase_1(int fd, int *pin)
                         state[i] = digitalRead(pin[i]);
                         flag += state[i];
                     }
-                    if (flag != 0) break;
+                    if (flag != 0)
+                    {
+                        printf("turn_end\n");
+                        break;
+                    }
                 }
+            }
+            else if (flag == 0) // test (True value is "0")
+            {
+                pre_flag = 0;
+                old_time = clock();
             }
 
             if ((state[2] == 1) && flag == 1 && (r != RM || l != LM))
@@ -169,13 +181,13 @@ int phase_1(int fd, int *pin)
             {
                 printf("left\n");
                 r = RM;
-                l = 0.9 * LM;
+                l = 0.8 * LM;
                 break;
             }
             if ((state[3] == 1) && (r != 0.8 * RM || l != LM))
             {
                 printf("right\n");
-                r = 0.9 * RM;
+                r = 0.8 * RM;
                 l = LM;
                 break;
             }

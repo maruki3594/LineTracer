@@ -46,8 +46,8 @@
 #define PWM_PRESCALE 254
 
 // モーターの制御値
-#define LM 4
-#define RM 4
+#define LM 7
+#define RM 7
 
 int phase_1(int fd, int *pin);
 int phase_2(int fd, int *pin);
@@ -126,6 +126,8 @@ int motor_drive(int fd, int lm, int rm)
     return 0;                        // 戻り値は常に 0
 }
 
+// 前を見て左から0, 1, 2, 3, 4
+// 黒のときに1
 int phase_1(int fd, int *pin)
 {
     printf("phase1\n");
@@ -147,57 +149,51 @@ int phase_1(int fd, int *pin)
                 return 0;
             }
 
-            // acute right
-            if (state[3] == 1 && state[4] == 1 && flag == 2)
+            // // acute right
+            if (state[2] == 1 && (state[1] == 1 || state[3] == 1) && state[0] == 0 && state[4] == 0 && (r != RM || l != LM))
             {
-                if (r != 0 || l != LM)
-                {
-                    printf("acute right\n");
-                    r = 0;
-                    l = LM;
-                    break;
-                }
-                continue;
+                printf("straight\n");
+                r = RM;
+                l = LM;
+                break;
             }
+            else if (state[3] == 1 && state[4] == 1 && flag == 2 && (r != 0 * RM || l != LM))
+            {
+                printf("acute right\n");
+                r = 0 * RM;
+                l = LM;
+                break;
+            }
+            // else if (state[2] == 1 && state[3] == 1 && flag == 2 && (r != 0.5 * RM || l != LM))
+            // {
+            //     printf("right\n");
+            //     r = 0.9 * RM;
+            //     l = LM;
+            //     break;
+            // }
+            else if (state[0] == 1 && state[1] == 1 && flag == 2 && (r != RM || l != 0 * LM))
+            {
+                printf("acute left\n");
+                r = RM;
+                l = 0 * LM;
+                break;
+            }
+            // if (state[1] == 1 && state[2] == 1 && flag == 2 && (r != RM || l != 0.5 * LM))
+            // {
+            //     printf("left\n");
+            //     r = RM;
+            //     l = 0.9 * LM;
+            //     break;
+            // }
 
-            // right
-            if (state[2] == 1 && state[3] == 1 && flag == 2)
-            {
-                if (r != 0.5 * RM || l != LM)
-                {
-                    printf("right\n");
-                    r = 0.5 * RM;
-                    l = LM;
-                    break;
-                }
-                continue;
-            }
-
-            // acute left
-            if (state[0] == 1 && state[1] == 1 && flag == 2)
-            {
-                if (r != RM || l != 0)
-                {
-                    printf("acute left\n");
-                    r = RM;
-                    l = 0;
-                    break;
-                }
-                continue;
-            }
-
-            // left
-            if (state[1] == 1 && state[2] == 1 && flag == 2)
-            {
-                if (r != RM || l != 0.5 * LM)
-                {
-                    printf("left\n");
-                    r = RM;
-                    l = 0.5 * LM;
-                    break;
-                }
-                continue;
-            }
+            // if (state[2] == 1 && (state[1] == 1 || state[3] == 1) && state[0] == 0 && state[4] == 0 && (r != RM || l != LM))
+            // {
+            //     printf("straight\n");
+            //     r = RM;
+            //     l = LM;
+            //     break;
+            // }
+            
 
             // straight
             /*if (state[2] == 1 && (state[1] == 1 || state[3] == 1) && flag == 2)
@@ -253,16 +249,19 @@ int phase_1(int fd, int *pin)
   }
 }*/
 
+
+// 後ろを見て左から4, 3, 2, 1, 0
+// 黒のときに1
 int phase_2(int fd, int *pin)
 {
     printf("phase2\n");
     int state[5] = {0};
-    int i, l, r;
-    int flag = 0;
+    int i, l, r, flag;
     while (1)
     {
         while (1)
         {
+            flag = 0;
             for (i = 0; i < 5; i++)
             {
                 state[i] = digitalRead(pin[i]);
@@ -272,26 +271,38 @@ int phase_2(int fd, int *pin)
             {
                 return 0;
             }
-            if (state[3] == 0 && state[4] == 0 && (r != -RM * -0.5 || l != -LM))
+            if (state[3] == 1 && state[4] == 1 && flag == 2 && (r != 0 || l != -LM))
             {
-                r = -RM * -0.5;
-                l = -LM;
-                break;
-            }
-            if (state[3] == 0 && (r != 0 || l != -LM))
-            {
+                printf("acute left\n");
                 r = 0;
                 l = -LM;
                 break;
             }
-            if (state[2] == 0 && (r != RM || l != -LM))
+            else if (state[2] == 1 && state[3] == 1 && flag == 2 && (r != 0.5 * -RM || l != -LM))
             {
-                r = -RM;
+                printf("left\n");
+                r = 0.8 * -RM;
                 l = -LM;
                 break;
             }
+            else if (state[0] == 1 && state[1] == 1 && flag == 2 && (r != -RM || l != 0))
+            {
+                printf("acute right\n");
+                r = -RM;
+                l = 0;
+                break;
+            }
+            else if (state[1] == 1 && state[2] == 1 && flag == 2 && (r != -RM || l != 0.5 * -LM))
+            {
+                printf("right\n");
+                r = -RM;
+                l = 0.8 * -LM;
+                break;
+            }
+
         }
         motor_drive(fd, l, r);
+        delay(100);
     }
 }
 
