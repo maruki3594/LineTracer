@@ -149,7 +149,7 @@ int phase_1(int fd, int *pin)
             flag = 0;
             for (i = 0; i < 5; i++)
             {
-                if (state[i] == 0)
+                if (digitalRead(pin[i]) == 0)
                 {
                     state[i] = 1;
                 }
@@ -157,7 +157,6 @@ int phase_1(int fd, int *pin)
                 {
                     state[i] = 0;
                 }
-                
                 flag += state[i];
                 // state[i] *= RM;
             }

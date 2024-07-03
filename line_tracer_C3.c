@@ -145,7 +145,7 @@ int phase_1(int fd, int *pin)
                 state[i] = digitalRead(pin[i]);
                 flag += state[i];
             }
-            if (flag == 0 && clock() >= old_time + 100)
+            if (flag == 0 && clock() >= old_time + 500)
             {
                 motor_drive(fd, -RM, LM);
                 printf("turn\n");
