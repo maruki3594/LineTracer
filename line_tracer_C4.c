@@ -46,8 +46,8 @@
 #define PWM_PRESCALE 254
 
 // モーターの制御値
-#define LM 7
-#define RM 7
+#define LM 7.0
+#define RM 7.0
 
 const double Kp = 1.0;
 const double Ki = 0.1;
@@ -135,9 +135,9 @@ int motor_drive(int fd, int lm, int rm)
 int phase_1(int fd, int *pin)
 {
     printf("phase1\n"); 
-    int state[5] = {0};
+    double state[5] = {0};
     int i, l, r, flag;
-    double set_point = RM;
+    double set_point = 0;
     double error = 0;
     double integral = 0;
     double previous_error = 0;
@@ -151,7 +151,7 @@ int phase_1(int fd, int *pin)
             {
                 if (digitalRead(pin[i]) == 0)
                 {
-                    state[i] = 1;
+                    state[i] = (RM + LM) / 2.0;
                 }
                 else
                 {
@@ -177,18 +177,18 @@ int phase_1(int fd, int *pin)
             //     motor_drive(fd, RM, LM);
             // }
 
-            error = (state[0] * 0.5 + state[1] * 0.75 + state[2] * 1.0 + state[3] * -0.75 + state[4] * -0.5) - set_point;
+            error = (state[0] * 1.0 + state[1] * 0.2 + state[2] * 0.0 + state[3] * -0.2 + state[4] * -1.0) - set_point;
             integral += error;
             derivative = error - previous_error;
             output = Kp * error + Ki * integral + Kd * derivative;
 
             // モーターの速度を調整
-            motor_drive(fd, RM + output, LM - output);
-            printf("%f %f\r", RM + output, LM - output);
+            motor_drive(fd, RM + (output / RM), LM - (output / LM));
+            printf("%f %f\r", RM + (output / RM), LM - (output / LM));
 
             previous_error = error;
             
-            delay(10);           
+            delay(100);           
         }
         motor_drive(fd, l, r);
     }
