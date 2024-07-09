@@ -48,8 +48,8 @@
 #define PWM_PRESCALE 254
 
 // モーターの制御値
-#define LM 7
-#define RM 7
+#define LM 8
+#define RM 8
 
 int phase_1(int fd, int *pin);
 int phase_2(int fd, int *pin);
@@ -175,15 +175,18 @@ int phase_1(int fd, int *pin)
                 }
                 if (flag == 0)
                 {
+                    printf("full white\n");
                     pre_flag = 0;
+                    // old_time = clock();
                 }
                 old_time = clock();
             }
-            else if (flag == 0) // test (True value is "0")
-            {
-                pre_flag = 0;
-                old_time = clock();
-            }
+            // else if (flag == 0) // test (True value is "0")
+            // {
+            //     pre_flag = 0;
+            //     printf("full white\n");
+            //     old_time = clock();
+            // }
 
             if ((state[2] == 1) && flag == 1 && (r != RM || l != LM))
             {
@@ -192,37 +195,37 @@ int phase_1(int fd, int *pin)
                 l = LM;
                 break;
             }
-            if ((state[1] == 1) && (r != RM || l != 0.9 * LM))
+            if ((state[1] == 1) && (r != RM || l != 0 * LM))
             {
                 printf("left\n");
                 r = RM;
-                l = 0.9 * LM;
+                l = 0 * LM;
                 break;
             }
-            if ((state[3] == 1) && (r != 0.9 * RM || l != LM))
+            if ((state[3] == 1) && (r != 0 * RM || l != LM))
             {
                 printf("right\n");
-                r = 0.9 * RM;
+                r = 0 * RM;
                 l = LM;
                 break;
             }
-            if ((state[0] == 1) && (r != RM || l != 0))
+            if ((state[0] == 1) && (r != RM || l != 0 * LM))
             {
                 printf("acute left\n");
                 r = RM;
-                l = 0;
+                l = 0 * LM;
                 break;
             }
-            if ((state[4] == 1) && (r != 0 || l != LM))
+            if ((state[4] == 1) && (r != 0 * RM || l != LM))
             {
                 printf("acute right\n");
-                r = 0;
+                r = 0 * RM;
                 l = LM;
                 break;
             }
         }
         motor_drive(fd, l, r);
-        delay(100);
+        delay(50);
     }
 }
 

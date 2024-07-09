@@ -49,7 +49,9 @@
 #define LM 7.0
 #define RM 7.0
 
-const double Kp = 1.0;
+
+// PID coefficient
+const double Kp = 0.5;
 const double Ki = 0.0;
 const double Kd = 0.0; 
 
@@ -177,29 +179,33 @@ int phase_1(int fd, int *pin)
             //     motor_drive(fd, RM, LM);
             // }
 
-            error = (state[0] * 1.0 + state[1] * 0.1 + state[2] * 0.0 + state[3] * -0.1 + state[4] * -1.0) - set_point;
+            error = (state[0] * 1.0 + state[1] * 0.3 + state[2] * 0.0 + state[3] * -0.3 + state[4] * -1.0) - set_point;
             integral += error;
             derivative = error - previous_error;
             output = Kp * error + Ki * integral + Kd * derivative;
 
             // モーターの速度を調整
-            if (output < 0)
-            {
-                motor_drive(fd, RM, LM - output);
-            }
-            else if (output > 0)
-            {
-                motor_drive(fd, RM + output, LM);
-            }
-            else
-            {
-                motor_drive(fd, RM, LM);
-            }
-            printf("%f %f\r", RM + output/ 2, LM - output/ 2);
+            // if (output < 0)
+            // {
+            //     motor_drive(fd, RM, LM - output);
+            //     printf("%f %f\r", RM, LM - output);
+            // }
+            // else if (output > 0)
+            // {
+            //     motor_drive(fd, RM + output, LM);
+            //     printf("%f %f\r", RM + output, LM);
+            // }
+            // else
+            // {
+            //     motor_drive(fd, RM, LM);
+            //     printf("%f %f\r", RM, LM);
+            // }
+            motor_drive(fd, RM + output / 2, LM - output / 2);
+            printf("%f %f\r", RM + output/ 2, LM - output / 2);
 
             previous_error = error;
             
-            // delay(100);           
+            delay(100);           
         }
         motor_drive(fd, l, r);
     }
