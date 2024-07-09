@@ -4,6 +4,7 @@
 #include <wiringPi.h>
 #include <wiringPiI2C.h>
 #include <time.h>
+// #include <ctime.h>
 
 // 以下、定数宣言です
 // PWM ユニットの I2C アドレス
@@ -134,7 +135,9 @@ int phase_1(int fd, int *pin)
     printf("phase1\n"); 
     int state[5] = {0};
     int old_time = clock();
-    int i, l, r, flag, pre_flag;
+    int i;
+    double l, r;
+    int flag, pre_flag;
     while (1)
     {
         while (1)
@@ -145,24 +148,36 @@ int phase_1(int fd, int *pin)
                 state[i] = digitalRead(pin[i]);
                 flag += state[i];
             }
-            if (flag == 0 && clock() >= old_time + 500)
+            if (((double)(clock() - old_time) / CLOCKS_PER_SEC * 1000) >= 500)
             {
-                motor_drive(fd, -RM, LM);
-                printf("turn\n");
-                while (1)
+                if (pre_flag == 0 && flag == 0)
                 {
-                    flag = 0;
-                    for (i = 0; i < 5; i++)
+                    motor_drive(fd, -RM, LM);
+                    printf("turn\n");
+                    while (1)
                     {
-                        state[i] = digitalRead(pin[i]);
-                        flag += state[i];
-                    }
-                    if (flag != 0)
-                    {
-                        printf("turn_end\n");
-                        break;
+                        flag = 0;
+                        for (i = 0; i < 5; i++)
+                        {
+                            state[i] = digitalRead(pin[i]);
+                            flag += state[i];
+                        }
+                        if (flag != 0)
+                        {
+                            printf("turn_end\n");
+                            break;
+                        }
                     }
                 }
+                else
+                {
+                    pre_flag = 1;
+                }
+                if (flag == 0)
+                {
+                    pre_flag = 0;
+                }
+                old_time = clock();
             }
             else if (flag == 0) // test (True value is "0")
             {
@@ -177,17 +192,17 @@ int phase_1(int fd, int *pin)
                 l = LM;
                 break;
             }
-            if ((state[1] == 1) && (r != RM || l != 0.8 * LM))
+            if ((state[1] == 1) && (r != RM || l != 0.9 * LM))
             {
                 printf("left\n");
                 r = RM;
-                l = 0.8 * LM;
+                l = 0.9 * LM;
                 break;
             }
-            if ((state[3] == 1) && (r != 0.8 * RM || l != LM))
+            if ((state[3] == 1) && (r != 0.9 * RM || l != LM))
             {
                 printf("right\n");
-                r = 0.8 * RM;
+                r = 0.9 * RM;
                 l = LM;
                 break;
             }

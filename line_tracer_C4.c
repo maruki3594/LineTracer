@@ -50,8 +50,8 @@
 #define RM 7.0
 
 const double Kp = 1.0;
-const double Ki = 0.1;
-const double Kd = 0.01; 
+const double Ki = 0.0;
+const double Kd = 0.0; 
 
 int phase_1(int fd, int *pin);
 int phase_2(int fd, int *pin);
@@ -177,18 +177,29 @@ int phase_1(int fd, int *pin)
             //     motor_drive(fd, RM, LM);
             // }
 
-            error = (state[0] * 1.0 + state[1] * 0.2 + state[2] * 0.0 + state[3] * -0.2 + state[4] * -1.0) - set_point;
+            error = (state[0] * 1.0 + state[1] * 0.1 + state[2] * 0.0 + state[3] * -0.1 + state[4] * -1.0) - set_point;
             integral += error;
             derivative = error - previous_error;
             output = Kp * error + Ki * integral + Kd * derivative;
 
             // モーターの速度を調整
-            motor_drive(fd, RM + (output / RM), LM - (output / LM));
-            printf("%f %f\r", RM + (output / RM), LM - (output / LM));
+            if (output < 0)
+            {
+                motor_drive(fd, RM, LM - output);
+            }
+            else if (output > 0)
+            {
+                motor_drive(fd, RM + output, LM);
+            }
+            else
+            {
+                motor_drive(fd, RM, LM);
+            }
+            printf("%f %f\r", RM + output/ 2, LM - output/ 2);
 
             previous_error = error;
             
-            delay(100);           
+            // delay(100);           
         }
         motor_drive(fd, l, r);
     }
