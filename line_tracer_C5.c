@@ -209,18 +209,18 @@ int phase_1(int fd, int *pin)
                 l = LM;
                 break;
             }
-            if ((state[0] == 1) && (r != 1.5 * RM || l != 0.5 * LM))
+            if ((state[0] == 1) && (r != RM || l != 0 * LM))
             {
                 printf("acute left\n");
-                r = 1.5 * RM;
-                l = 0.5 * LM;
+                r = RM;
+                l = 0 * LM;
                 break;
             }
-            if ((state[4] == 1) && (r != 0.5 * RM || l != 1.5 * LM))
+            if ((state[4] == 1) && (r != 0 * RM || l != LM))
             {
                 printf("acute right\n");
-                r = 0.5 * RM;
-                l = 1.5 * LM;
+                r = 0 * RM;
+                l = LM;
                 break;
             }
         }

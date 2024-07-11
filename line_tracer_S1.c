@@ -48,8 +48,8 @@
 #define PWM_PRESCALE 254
 
 // モーターの制御値
-#define LM 8
-#define RM 8
+#define LM 7
+#define RM 7
 
 int phase_1(int fd, int *pin);
 int phase_2(int fd, int *pin);
@@ -148,39 +148,39 @@ int phase_1(int fd, int *pin)
                 state[i] = digitalRead(pin[i]);
                 flag += state[i];
             }
-            if (((double)(clock() - old_time) / CLOCKS_PER_SEC * 1000) >= 200)
-            {
-                if (pre_flag == 0 && flag == 0)
-                {
-                    motor_drive(fd, -RM, LM);
-                    printf("turn\n");
-                    while (1)
-                    {
-                        flag = 0;
-                        for (i = 0; i < 5; i++)
-                        {
-                            state[i] = digitalRead(pin[i]);
-                            flag += state[i];
-                        }
-                        if (flag != 0)
-                        {
-                            printf("turn_end\n");
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    pre_flag = 1;
-                }
-                if (flag == 0)
-                {
-                    printf("full white\n");
-                    pre_flag = 0;
-                    // old_time = clock();
-                }
-                old_time = clock();
-            }
+            // if (((double)(clock() - old_time) / CLOCKS_PER_SEC * 1000) >= 200)
+            // {
+            //     if (pre_flag == 0 && flag == 0)
+            //     {
+            //         motor_drive(fd, -RM, LM);
+            //         printf("turn\n");
+            //         while (1)
+            //         {
+            //             flag = 0;
+            //             for (i = 0; i < 5; i++)
+            //             {
+            //                 state[i] = digitalRead(pin[i]);
+            //                 flag += state[i];
+            //             }
+            //             if (flag != 0)
+            //             {
+            //                 printf("turn_end\n");
+            //                 break;
+            //             }
+            //         }
+            //     }
+            //     else
+            //     {
+            //         pre_flag = 1;
+            //     }
+            //     if (flag == 0)
+            //     {
+            //         printf("full white\n");
+            //         pre_flag = 0;
+            //         // old_time = clock();
+            //     }
+            //     old_time = clock();
+            // }
             // else if (flag == 0) // test (True value is "0")
             // {
             //     pre_flag = 0;
@@ -209,18 +209,18 @@ int phase_1(int fd, int *pin)
                 l = LM;
                 break;
             }
-            if ((state[0] == 1) && (r != 1.5 * RM || l != 0.5 * LM))
+            if ((state[0] == 1) && (r != RM || l != 0 * LM))
             {
                 printf("acute left\n");
-                r = 1.5 * RM;
-                l = 0.5 * LM;
+                r = RM;
+                l = 0 * LM;
                 break;
             }
-            if ((state[4] == 1) && (r != 0.5 * RM || l != 1.5 * LM))
+            if ((state[4] == 1) && (r != 0 * RM || l != LM))
             {
                 printf("acute right\n");
-                r = 0.5 * RM;
-                l = 1.5 * LM;
+                r = 0 * RM;
+                l = LM;
                 break;
             }
         }
