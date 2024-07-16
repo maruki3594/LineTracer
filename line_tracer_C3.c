@@ -177,16 +177,9 @@ int phase_1(int fd, int *pin)
                 {
                     printf("full white\n");
                     pre_flag = 0;
-                    // old_time = clock();
                 }
                 old_time = clock();
             }
-            // else if (flag == 0) // test (True value is "0")
-            // {
-            //     pre_flag = 0;
-            //     printf("full white\n");
-            //     old_time = clock();
-            // }
 
             if ((state[2] == 1) && flag == 1 && (r != RM || l != LM))
             {
