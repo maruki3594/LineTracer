@@ -51,9 +51,9 @@
 
 
 // PID coefficient
-const double Kp = 0.3;
-const double Ki = 0.001;
-const double Kd = 0.0001; 
+const double Kp = 0.1;
+const double Ki = 0.006;
+const double Kd = 0.0000; 
 
 int phase_1(int fd, int *pin);
 int phase_2(int fd, int *pin);
@@ -188,6 +188,16 @@ int phase_1(int fd, int *pin)
             l = RM + output / 2;
             r = LM - output / 2;
 
+            if (integral > 1600)
+            {
+                integral = 1600;
+            }
+            else if (integral < -1600)
+            {
+                integral = -1600;
+            }
+            
+
             // モーターの速度を調整
             // if (output < 0)
             // {
@@ -216,7 +226,7 @@ int phase_1(int fd, int *pin)
 
             previous_error = error;
             
-            delay(10);           
+            delay(20);           
         }
         motor_drive(fd, l, r);
     }
