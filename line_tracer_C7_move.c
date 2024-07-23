@@ -148,7 +148,7 @@ int phase_1(int fd, int *pin)
                 state[i] = digitalRead(pin[i]);
                 flag += state[i];
             }
-            // if (((double)(clock() - old_time) / CLOCKS_PER_SEC * 1000) >= 200)
+            // if (((double)(clock() - old_time) / CLOCKS_PER_SEC * 1000) >= 750)
             // {
             //     if (pre_flag == 0 && flag == 0)
             //     {

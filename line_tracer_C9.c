@@ -48,8 +48,8 @@
 #define PWM_PRESCALE 254
 
 // モーターの制御値
-#define LM 6
-#define RM 6
+#define LM 5
+#define RM 5
 
 int phase_1(int fd, int *pin);
 int phase_2(int fd, int *pin);
@@ -138,6 +138,7 @@ int phase_1(int fd, int *pin)
     int i;
     double l, r;
     int flag, pre_flag;
+    int init = 1;
     while (1)
     {
         while (1)
@@ -148,39 +149,76 @@ int phase_1(int fd, int *pin)
                 state[i] = digitalRead(pin[i]);
                 flag += state[i];
             }
-            if (((double)(clock() - old_time) / CLOCKS_PER_SEC * 1000) >= 200)
-            {
-                if (pre_flag == 0 && flag == 0)
-                {
-                    motor_drive(fd, -RM, LM);
-                    printf("turn\n");
-                    while (1)
-                    {
-                        flag = 0;
-                        for (i = 0; i < 5; i++)
-                        {
-                            state[i] = digitalRead(pin[i]);
-                            flag += state[i];
-                        }
-                        if (flag != 0)
-                        {
-                            printf("turn_end\n");
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    pre_flag = 1;
-                }
-                if (flag == 0)
-                {
-                    printf("full white\n");
-                    pre_flag = 0;
-                    // old_time = clock();
-                }
-                old_time = clock();
-            }
+            // if (((double)(clock() - old_time) / CLOCKS_PER_SEC * 1000) >= 1000)
+            // {
+            //     if (pre_flag == 0 && flag == 0 && init)
+            //     {
+            //         init = 0;
+            //         r = 10;
+            //         l = 10;
+            //         motor_drive(fd, l, r);
+            //         while (1)
+            //         {
+            //             flag = 0;
+            //             for (i = 0; i < 5; i++)
+            //             {
+            //                 state[i] = digitalRead(pin[i]);
+            //                 flag += state[i];
+            //             }
+            //             if (flag != 0)
+            //             {
+            //                 printf("turn_end\n");
+            //                 break;
+            //             }
+            //         }
+            //     }
+            //     else
+            //     {
+            //         pre_flag = 1;
+            //     }
+            //     if (flag == 0)
+            //     {
+            //         printf("full white\n");
+            //         pre_flag = 0;
+            //         // old_time = clock();
+            //     }
+            //     old_time = clock();
+            // }
+            // if (((double)(clock() - old_time) / CLOCKS_PER_SEC * 1000) >= 200)
+            // {
+            //     if (pre_flag == 0 && flag == 0)
+            //     {
+            //         l = LM;
+            //         r = RM;
+            //         motor_drive(fd, l, r);
+            //         printf("turn\n");
+            //         while (1)
+            //         {
+            //             flag = 0;
+            //             for (i = 0; i < 5; i++)
+            //             {
+            //                 state[i] = digitalRead(pin[i]);
+            //                 flag += state[i];
+            //             }
+            //             if (flag != 0)
+            //             {
+            //                 printf("turn_end\n");
+            //                 break;
+            //             }
+            //         }
+            //     }
+            //     else
+            //     {
+            //         pre_flag = 1;
+            //     }
+            //     if (flag == 0)
+            //     {
+            //         printf("full white\n");
+            //         pre_flag = 0;
+            //         // old_time = clock();
+            //     }
+            //     old_time = clock();
+            // }
             // else if (flag == 0) // test (True value is "0")
             // {
             //     pre_flag = 0;
@@ -195,41 +233,41 @@ int phase_1(int fd, int *pin)
                 l = LM;
                 break;
             }
-            // if ((state[1] == 1) && (r != 1.2 * RM || l != 0.8 * LM))
-            if ((state[1] == 1) && (r != RM || l != 0.8 * LM))
+            if ((state[1] == 1) && (r != 1.2 * RM || l != 0.9 * LM))
+            // if ((state[1] == 1) && (r != RM || l != 0.8 * LM))
             {
                 printf("left\n");
-                r = RM;
-                l = 0.8 * LM;
+                r = 1.2 * RM;
+                l = 0.9 * LM;
                 break;
             }
-            // if ((state[3] == 1) && (r != 0.8 * RM || l != 1.2 * LM))
-            if ((state[3] == 1) && (r != 0.8 * RM || l != LM))
+            if ((state[3] == 1) && (r != 0.9 * RM || l != 1.2 * LM))
+            // if ((state[3] == 1) && (r != 0.8 * RM || l != LM))
             {
                 printf("right\n");
-                r = 0.8 * RM;
-                l = LM;
+                r = 0.9 * RM;
+                l = 1.2 * LM;
                 break;
             }
-            // if ((state[0] == 1) && (r != 1.5 * RM || l != 0.5 * LM))
-            if ((state[0] == 1) && (r != RM || l != 0 * LM))
+            if ((state[0] == 1) && (r != 1.5 * RM || l != 0.5 * LM))
+            // if ((state[0] == 1) && (r != RM || l != 0 * LM))
             {
                 printf("acute left\n");
-                r = RM;
-                l = 0 * LM;
+                r = 1.5 * RM;
+                l = 0.5 * LM;
                 break;
             }
-            // if ((state[4] == 1) && (r != 0.5 * RM || l != 1.5 * LM))
-            if ((state[4] == 1) && (r != 0 * RM || l != LM))
+            if ((state[4] == 1) && (r != 0.4 * RM || l != 1.5 * LM))
+            // if ((state[4] == 1) && (r != 0 * RM || l != LM))
             {
                 printf("acute right\n");
-                r = 0 * RM;
-                l = LM;
+                r = 0.5 * RM;
+                l = 1.5 * LM;
                 break;
             }
         }
         motor_drive(fd, l, r);
-        delay(50);
+        delay(20);
     }
 }
 

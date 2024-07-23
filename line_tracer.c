@@ -134,9 +134,9 @@ int main()
     delay(1);                                   // wait for stabilizing internal oscillator
     wiringPiI2CWriteReg8(fd, PWM_MODE1, 0x80);  // Restart all PWM ch
 
-    while (1){
-        motor_drive(fd, 7, 0);    //左右のタイヤを前方向に
-        delay(250);
-        motor_drive(fd, 0, 7);
-    }
+        motor_drive(fd, 7, 7);    //左右のタイヤを前方向に
+    // while (1){
+        // delay(250);
+        // motor_drive(fd, 0, 7);
+    // }
 }

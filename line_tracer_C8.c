@@ -48,8 +48,8 @@
 #define PWM_PRESCALE 254
 
 // モーターの制御値
-#define LM 7
-#define RM 7
+#define LM 6
+#define RM 6
 
 int phase_1(int fd, int *pin);
 int phase_2(int fd, int *pin);
@@ -149,43 +149,43 @@ int phase_1(int fd, int *pin)
                 state[i] = digitalRead(pin[i]);
                 flag += state[i];
             }
-            if (((double)(clock() - old_time) / CLOCKS_PER_SEC * 1000) >= 1000)
-            {
-                if (pre_flag == 0 && flag == 0 && init)
-                {
-                    motor_drive(fd, LM + 1, RM - 1);
-                    delay(50);
-                    motor_drive(fd, LM, RM + 1);
-                    delay(50);
-                    motor_drive(fd, LM, RM);
-                    init = 0;
-                    while (1)
-                    {
-                        flag = 0;
-                        for (i = 0; i < 5; i++)
-                        {
-                            state[i] = digitalRead(pin[i]);
-                            flag += state[i];
-                        }
-                        if (flag != 0)
-                        {
-                            printf("turn_end\n");
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    pre_flag = 1;
-                }
-                if (flag == 0)
-                {
-                    printf("full white\n");
-                    pre_flag = 0;
-                    // old_time = clock();
-                }
-                old_time = clock();
-            }
+            // if (((double)(clock() - old_time) / CLOCKS_PER_SEC * 1000) >= 1500)
+            // {
+            //     if (pre_flag == 0 && flag == 0 && init)
+            //     {
+            //         motor_drive(fd, LM + 1, RM);
+            //         delay(200);
+            //         motor_drive(fd, LM - 1, RM + 1);
+            //         delay(200);
+            //         motor_drive(fd, LM, RM);
+            //         init = 0;
+            //         while (1)
+            //         {
+            //             flag = 0;
+            //             for (i = 0; i < 5; i++)
+            //             {
+            //                 state[i] = digitalRead(pin[i]);
+            //                 flag += state[i];
+            //             }
+            //             if (flag != 0)
+            //             {
+            //                 printf("turn_end\n");
+            //                 break;
+            //             }
+            //         }
+            //     }
+            //     else
+            //     {
+            //         pre_flag = 1;
+            //     }
+            //     if (flag == 0)
+            //     {
+            //         printf("full white\n");
+            //         pre_flag = 0;
+            //         // old_time = clock();
+            //     }
+            //     old_time = clock();
+            // }
             // if (((double)(clock() - old_time) / CLOCKS_PER_SEC * 1000) >= 200)
             // {
             //     if (pre_flag == 0 && flag == 0)
