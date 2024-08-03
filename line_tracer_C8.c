@@ -138,6 +138,7 @@ int phase_1(int fd, int *pin)
     int i;
     double l, r;
     int flag, pre_flag;
+    int init = 1;
     while (1)
     {
         while (1)
@@ -148,6 +149,43 @@ int phase_1(int fd, int *pin)
                 state[i] = digitalRead(pin[i]);
                 flag += state[i];
             }
+            // if (((double)(clock() - old_time) / CLOCKS_PER_SEC * 1000) >= 1500)
+            // {
+            //     if (pre_flag == 0 && flag == 0 && init)
+            //     {
+            //         motor_drive(fd, LM + 1, RM);
+            //         delay(200);
+            //         motor_drive(fd, LM - 1, RM + 1);
+            //         delay(200);
+            //         motor_drive(fd, LM, RM);
+            //         init = 0;
+            //         while (1)
+            //         {
+            //             flag = 0;
+            //             for (i = 0; i < 5; i++)
+            //             {
+            //                 state[i] = digitalRead(pin[i]);
+            //                 flag += state[i];
+            //             }
+            //             if (flag != 0)
+            //             {
+            //                 printf("turn_end\n");
+            //                 break;
+            //             }
+            //         }
+            //     }
+            //     else
+            //     {
+            //         pre_flag = 1;
+            //     }
+            //     if (flag == 0)
+            //     {
+            //         printf("full white\n");
+            //         pre_flag = 0;
+            //         // old_time = clock();
+            //     }
+            //     old_time = clock();
+            // }
             // if (((double)(clock() - old_time) / CLOCKS_PER_SEC * 1000) >= 200)
             // {
             //     if (pre_flag == 0 && flag == 0)
@@ -216,20 +254,20 @@ int phase_1(int fd, int *pin)
             {
                 printf("acute left\n");
                 r = 1.5 * RM;
-                l = 0.5 * LM;
+                l = 0.4 * LM;
                 break;
             }
-            if ((state[4] == 1) && (r != 0.5 * RM || l != 1.5 * LM))
+            if ((state[4] == 1) && (r != 0.4 * RM || l != 1.5 * LM))
             // if ((state[4] == 1) && (r != 0 * RM || l != LM))
             {
                 printf("acute right\n");
-                r = 0.5 * RM;
+                r = 0.4 * RM;
                 l = 1.5 * LM;
                 break;
             }
         }
         motor_drive(fd, l, r);
-        delay(50);
+        delay(20);
     }
 }
 
